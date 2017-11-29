@@ -8,6 +8,7 @@ using ServerForTheLogic;
 using ServerForTheLogic.ClientObject.Building;
 using ServerForTheLogic.ClientObject;
 using System;
+using System.Diagnostics;
 
 namespace DataAccessLayer {
 
@@ -254,9 +255,9 @@ namespace DataAccessLayer {
         /// <param name="guid">The Guid of the object being retrieved from the database</param>
         /// <returns>The object based on the Guid otherwise returns null</returns>
         public Object GetObjectByGuid(Guid guid) {
-            var filter = Builders<BsonDocument>.Filter.Eq("guid", guid);
+            var filter = Builders<BsonDocument>.Filter.Eq("Guid", guid);
             foreach (var collectionName in Database.ListCollectionsAsync().Result.ToListAsync<BsonDocument>().Result) {
-                var collection = Database.GetCollection<BsonDocument>(collectionName.ToString());
+                var collection = Database.GetCollection<BsonDocument>("Person");
                 var document = collection.Find(filter).First();
                 if (document != null) {
                     Object myObj = BsonSerializer.Deserialize<Object>(document.ToJson());
@@ -605,7 +606,7 @@ namespace DataAccessLayer {
             }
 
             var update = Builders<BsonDocument>.Update
-                .Set("guid", guid)
+                .Set("Guid", guid)
                 .Set("XPoint", xPoint)
                 .Set("YPoint", yPoint);
             var result = await collection.UpdateOneAsync(filter, update);
@@ -628,7 +629,7 @@ namespace DataAccessLayer {
                 Console.WriteLine("clock collection is empty.");
                 return;
             }
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", clockData["_id"].ToString());
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(clockData["_id"].ToString()));
 
             Clock clockToUpdate = new Clock(minutes, hours, days, years);
             if (!DALValidator.DALClockValidator(clockToUpdate)) {

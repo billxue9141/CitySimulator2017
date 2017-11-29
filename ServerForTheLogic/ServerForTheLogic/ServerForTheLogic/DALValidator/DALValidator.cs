@@ -33,7 +33,7 @@ namespace DataAccessLayer
     ///     added new classes: Road, Product, Clock, SaveState
     /// </para>    
     /// </summary>
-    class DALValidator
+    public class DALValidator
     {
         /// <summary>
         /// Person Validator

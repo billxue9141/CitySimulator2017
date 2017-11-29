@@ -21,19 +21,28 @@ namespace DataAccessLayer.Tests
     public class MongoDALTests
     {
         [TestMethod()]
+        public void CreatePersonTest()
+        {
+            Guid newGuid = Guid.NewGuid();
+            Person testPerson = new Person(newGuid, "Fn", "Ln", 100, 200, Guid.NewGuid().ToString(), 1, 1, Guid.NewGuid().ToString(), 2, 2, 100, 50, 7, 9);
+            Assert.IsNotNull(testPerson);
+            Assert.IsTrue(DALValidator.DALPersonValidator(testPerson));
+        }
+
+        [TestMethod()]
         public void InsertPersonTest()
         {
             //Arrange
             MongoDAL db = new MongoDAL();
             Guid newGuid = Guid.NewGuid();
-            Person testPerson = new Person(newGuid, "Fn", "Ln", 100, 200, "test_workplace_id", 1, 1, "test_home_id", 2, 2, 100, 50, 7, 9);
+            Person testPerson = new Person(newGuid, "Fn", "Ln", 100, 200, Guid.NewGuid().ToString(), 1, 1, Guid.NewGuid().ToString(), 2, 2, 100, 50, 7, 9);
 
             //Act
             db.InsertPerson(testPerson);
 
             //Assert
-            Person returnedPerson = (Person)db.GetObjectByGuid(newGuid);
-            Assert.AreEqual(returnedPerson.Guid, newGuid);
+            Object returnedPerson = db.GetObjectByGuid(newGuid);
+            Assert.IsNotNull(returnedPerson);
         }
 
         [TestMethod()]
@@ -50,6 +59,43 @@ namespace DataAccessLayer.Tests
             Product returnedProduct = db.GetProduct("test_product_1");
             Console.WriteLine(returnedProduct.Name);
             Assert.AreEqual(returnedProduct.GlobalCount, 50);
+        }
+
+        [TestMethod()]
+        public void InsertClockTest()
+        {
+            MongoDAL db = new MongoDAL();
+            Clock testClock = new Clock(55, 22, 25, 1990);
+            db.InsertClock(testClock);
+
+            Clock returnedClock = db.GetClock();
+            Assert.AreEqual(55, returnedClock.NetMinutes);
+        }
+
+        [TestMethod()]
+        public void UpdateClockTest()
+        {
+            MongoDAL db = new MongoDAL();
+            db.UpdateClock(50, 22, 25, 1990);
+            Clock returnedClock = db.GetClock();
+            Assert.AreEqual(50, returnedClock.NetMinutes);
+        }
+
+        [TestMethod()]
+        public void UpdateProductByNameTest()
+        {
+            MongoDAL db = new MongoDAL();
+            db.UpdateProductByName("test_product_1", 20);
+
+            MongoDAL db1 = new MongoDAL();
+            Product returnedProduct = db1.GetProduct("test_product_1");
+            Assert.AreEqual(20, returnedProduct.GlobalCount);
+
+            db.UpdateProductByName("test_product_1", 30);
+
+            MongoDAL db2 = new MongoDAL();
+            Product returnedProduct2 = db2.GetProduct("test_product_1");
+            Assert.AreEqual(30, returnedProduct2.GlobalCount);
         }
     }
 }
